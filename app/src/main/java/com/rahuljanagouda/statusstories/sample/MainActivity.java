@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         ((SwitchCompat) findViewById(R.id.isTextEnabled)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                isTextEnabled = b;
+
             }
         });
 

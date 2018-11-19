@@ -11,8 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.rahuljanagouda.statusstories.glideProgressBar.DelayBitmapTransformation;
@@ -20,6 +22,8 @@ import com.rahuljanagouda.statusstories.glideProgressBar.LoggingListener;
 import com.rahuljanagouda.statusstories.glideProgressBar.ProgressTarget;
 
 import java.util.Locale;
+
+import static com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions.withCrossFade;
 
 public class StatusStoriesActivity extends AppCompatActivity implements StoryStatusView.UserInteractionListener {
 
@@ -75,14 +79,27 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         storyStatusView.pause();
         target.setModel(statusResources[counter]);
-        Glide.with(image.getContext())
+
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                //.skipMemoryCache(!isCaching)
+                //.diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+
+                .priority(Priority.HIGH);
+
+
+
+
+
+
+
+        GlideApp.with(image.getContext()).asBitmap()
                 .load(target.getModel())
-                .asBitmap()
-                .crossFade()
-                .skipMemoryCache(!isCaching)
-                .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
-                .transform(new CenterCrop(image.getContext()), new DelayBitmapTransformation(1000))
-                .listener(new LoggingListener<String, Bitmap>())
+                .transition(withCrossFade())
+                .apply(options.transforms(new CenterCrop(), new DelayBitmapTransformation(1000)))
+                .listener(new LoggingListener<Bitmap>())
                 .into(target);
 
         // bind reverse view
@@ -120,34 +137,44 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
         storyStatusView.pause();
         ++counter;
         target.setModel(statusResources[counter]);
-        Glide.with(image.getContext())
-                .load(target.getModel())
-                .asBitmap()
-                .crossFade()
+
+        RequestOptions options = new RequestOptions()
                 .centerCrop()
                 .skipMemoryCache(!isCaching)
                 .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
-                .transform(new CenterCrop(image.getContext()), new DelayBitmapTransformation(1000))
-                .listener(new LoggingListener<String, Bitmap>())
+
+                .priority(Priority.HIGH);
+
+
+        Glide.with(image.getContext()).asBitmap()
+                .load(target.getModel())
+                .transition(withCrossFade())
+                .apply(options.transforms(new CenterCrop(), new DelayBitmapTransformation(1000)))
+                .listener(new LoggingListener<Bitmap>())
                 .into(target);
     }
 
     @Override
     public void onPrev() {
 
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .skipMemoryCache(!isCaching)
+                .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
+
+                .priority(Priority.HIGH);
+
+
         if (counter - 1 < 0) return;
         storyStatusView.pause();
         --counter;
         target.setModel(statusResources[counter]);
-        Glide.with(image.getContext())
+        Glide.with(image.getContext()).asBitmap()
                 .load(target.getModel())
-                .asBitmap()
-                .centerCrop()
-                .crossFade()
-                .skipMemoryCache(!isCaching)
-                .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
-                .transform(new CenterCrop(image.getContext()), new DelayBitmapTransformation(1000))
-                .listener(new LoggingListener<String, Bitmap>())
+                .transition(withCrossFade())
+
+                .apply(options.transforms(new CenterCrop(), new DelayBitmapTransformation(1000)))
+                .listener(new LoggingListener<Bitmap>())
                 .into(target);
     }
 
