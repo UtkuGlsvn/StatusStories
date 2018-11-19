@@ -140,13 +140,15 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         RequestOptions options = new RequestOptions()
                 .centerCrop()
-                .skipMemoryCache(!isCaching)
-                .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
+                //.skipMemoryCache(!isCaching)
+                //.diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
 
                 .priority(Priority.HIGH);
 
 
-        Glide.with(image.getContext()).asBitmap()
+        GlideApp.with(image.getContext()).asBitmap()
                 .load(target.getModel())
                 .transition(withCrossFade())
                 .apply(options.transforms(new CenterCrop(), new DelayBitmapTransformation(1000)))
@@ -169,7 +171,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
         storyStatusView.pause();
         --counter;
         target.setModel(statusResources[counter]);
-        Glide.with(image.getContext()).asBitmap()
+        GlideApp.with(image.getContext()).asBitmap()
                 .load(target.getModel())
                 .transition(withCrossFade())
 
