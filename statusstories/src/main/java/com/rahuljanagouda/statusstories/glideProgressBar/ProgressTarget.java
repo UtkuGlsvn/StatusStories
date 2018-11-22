@@ -1,10 +1,12 @@
 package com.rahuljanagouda.statusstories.glideProgressBar;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.rahuljanagouda.statusstories.GlideApp;
 
 /**
  * Created by rahuljanagouda on 30/09/17.
@@ -84,11 +86,13 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
     protected abstract void onDelivered();
 
     private void start() {
+        Log.d("SEH", "start");
         OkHttpProgressGlideModule.expect(toUrlString(model), this);
         ignoreProgress = false;
         onProgress(0, Long.MAX_VALUE);
     }
     private void cleanup() {
+        Log.d("SEH", "cleanup");
         ignoreProgress = true;
         T model = this.model; // save in case it gets modified
         onDelivered();
@@ -97,10 +101,12 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
     }
 
     @Override public void onLoadStarted(Drawable placeholder) {
+        Log.d("SEH", "onLoadStarted");
         super.onLoadStarted(placeholder);
         start();
     }
     @Override public void onResourceReady(Z resource, Transition<? super Z> animation) {
+        Log.d("SEH", "onResourceReady");
         cleanup();
         //super.onResourceReady(resource, animation);
         //super.onResourceReady();
@@ -108,11 +114,14 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
 
     }
     @Override public void onLoadFailed( Drawable errorDrawable) {
-        cleanup();
+        Log.d("SEH", "onLoadFailed");
+        //cleanup();
         super.onLoadFailed(errorDrawable);
     }
     @Override public void onLoadCleared(Drawable placeholder) {
-        cleanup();
+        Log.d("SEH", "onLoadCleared");
+        //TODO: Control this area !!
+        //cleanup();
         super.onLoadCleared(placeholder);
     }
 }

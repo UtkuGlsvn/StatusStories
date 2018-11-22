@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
@@ -127,13 +128,7 @@ public class StoryStatusView extends LinearLayout {
         p.setProgress(0);
         isReverse = true;
         animators.get(current).cancel();
-        if (0 <= (current - 1)) {
-            p = progressBars.get(current - 1);
-            p.setProgress(0);
-            animators.get(--current).start();
-        } else {
-            animators.get(current).start();
-        }
+
     }
 
 
@@ -176,6 +171,7 @@ public class StoryStatusView extends LinearLayout {
         animation.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
+                Log.d("SEH", "onAnimationStart");
                 current = index;
             }
 
@@ -183,13 +179,23 @@ public class StoryStatusView extends LinearLayout {
             public void onAnimationEnd(Animator animation) {
                 if (isReverse) {
                     isReverse = false;
+                    if (0 <= (current - 1)) {
+                        ProgressBar p = progressBars.get(current - 1);
+                        p.setProgress(0);
+                        animators.get(--current).start();
+                    } else {
+                        animators.get(current).start();
+                    }
                     if (userInteractionListener != null) userInteractionListener.onPrev();
                     return;
                 }
                 int next = current + 1;
                 if (next <= (animators.size() - 1)) {
-                    if (userInteractionListener != null) userInteractionListener.onNext();
+                    Log.d("SEH", "onAnimationEnd");
                     animators.get(next).start();
+                    if (userInteractionListener != null) userInteractionListener.onNext();
+
+
                 } else {
                     isComplete = true;
                     if (userInteractionListener != null) userInteractionListener.onComplete();

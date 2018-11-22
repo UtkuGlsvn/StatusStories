@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -134,6 +135,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     public void onNext() {
 
+        Log.d("SEH", "onNext");
         storyStatusView.pause();
         ++counter;
         target.setModel(statusResources[counter]);
@@ -237,6 +239,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onConnecting() {
+            Log.d("SEH", "onConnecting");
             progress.setIndeterminate(true);
             progress.setVisibility(View.VISIBLE);
 
@@ -269,6 +272,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDownloaded() {
+            Log.d("SEH", "onDownloaded");
             progress.setIndeterminate(true);
             if (isTextEnabled) {
                 text.setVisibility(View.VISIBLE);
@@ -283,6 +287,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDelivered() {
+            Log.d("SEH", "onDelivered");
             progress.setVisibility(View.INVISIBLE);
             text.setVisibility(View.INVISIBLE);
             storyStatusView.resume();
