@@ -86,13 +86,13 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
     protected abstract void onDelivered();
 
     private void start() {
-        Log.d("SEH", "start");
+        //Log.d("SEH", "start");
         OkHttpProgressGlideModule.expect(toUrlString(model), this);
         ignoreProgress = false;
         onProgress(0, Long.MAX_VALUE);
     }
     private void cleanup() {
-        Log.d("SEH", "cleanup");
+        //Log.d("SEH", "cleanup");
         ignoreProgress = true;
         T model = this.model; // save in case it gets modified
         onDelivered();
@@ -101,12 +101,12 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
     }
 
     @Override public void onLoadStarted(Drawable placeholder) {
-        Log.d("SEH", "onLoadStarted");
+        //Log.d("SEH", "onLoadStarted");
         super.onLoadStarted(placeholder);
         start();
     }
     @Override public void onResourceReady(Z resource, Transition<? super Z> animation) {
-        Log.d("SEH", "onResourceReady");
+        //Log.d("SEH", "onResourceReady");
         cleanup();
         //super.onResourceReady(resource, animation);
         //super.onResourceReady();
@@ -114,12 +114,12 @@ public abstract class ProgressTarget<T, Z> extends WrappingTarget<Z> implements 
 
     }
     @Override public void onLoadFailed( Drawable errorDrawable) {
-        Log.d("SEH", "onLoadFailed");
+        //Log.d("SEH", "onLoadFailed");
         //cleanup();
         super.onLoadFailed(errorDrawable);
     }
     @Override public void onLoadCleared(Drawable placeholder) {
-        Log.d("SEH", "onLoadCleared");
+        //Log.d("SEH", "onLoadCleared");
         //TODO: Control this area !!
         //cleanup();
         super.onLoadCleared(placeholder);

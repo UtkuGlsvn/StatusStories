@@ -1,8 +1,10 @@
 package com.rahuljanagouda.statusstories;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +20,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.Target;
+import com.rahuljanagouda.statusstories.broadcastreceiver.StatusStoriesBroadcastReceiver;
+import com.rahuljanagouda.statusstories.data.StatusStoriesObject;
 import com.rahuljanagouda.statusstories.glideProgressBar.DelayBitmapTransformation;
 import com.rahuljanagouda.statusstories.glideProgressBar.LoggingListener;
 import com.rahuljanagouda.statusstories.glideProgressBar.ProgressTarget;
@@ -35,16 +39,24 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     public static final String IS_CACHING_ENABLED_KEY = "isCaching";
     public static final String IS_TEXT_PROGRESS_ENABLED_KEY = "isText";
 
+
+
+    public static final String KEY_STATUS_STORIES_LISTENER = "STATUS_STORIES_LISTENER";
+    public static final String KEY_STATUS_STORIES = "KEY_STATUS_STORIES";
+
     private static StoryStatusView storyStatusView;
     private ImageView image;
     private int counter = 0;
 
-    private String[] statusResources;
+//    private String[] statusResources;
     //    private long[] statusResourcesDuration;
-    private long statusDuration;
-    private boolean isImmersive = true;
-    private boolean isCaching = true;
+ //   private long statusDuration;
+ //   private boolean isImmersive = true;
+ //   private boolean isCaching = true;
     private static boolean isTextEnabled = true;
+
+    private StatusStoriesObject statusStoriesObject;
+
     private ProgressTarget<String, Bitmap> target;
 
     @Override
@@ -52,20 +64,17 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status_stories);
 
-        statusResources = getIntent().getStringArrayExtra(STATUS_RESOURCES_KEY);
-        statusDuration = getIntent().getLongExtra(STATUS_DURATION_KEY, 3000L);
-//        statusResourcesDuration = getIntent().getLongArrayExtra(STATUS_DURATIONS_ARRAY_KEY);
-        isImmersive = getIntent().getBooleanExtra(IS_IMMERSIVE_KEY, true);
-        isCaching = getIntent().getBooleanExtra(IS_CACHING_ENABLED_KEY, true);
-        isTextEnabled = getIntent().getBooleanExtra(IS_TEXT_PROGRESS_ENABLED_KEY, true);
+        statusStoriesObject = (StatusStoriesObject) getIntent().getSerializableExtra(this.KEY_STATUS_STORIES);
+        isTextEnabled = statusStoriesObject.getTextProgressEnabled();
+
 
         ProgressBar imageProgressBar = findViewById(R.id.imageProgressBar);
         TextView textView = findViewById(R.id.textView);
         image = findViewById(R.id.image);
 
         storyStatusView = findViewById(R.id.storiesStatus);
-        storyStatusView.setStoriesCount(statusResources.length);
-        storyStatusView.setStoryDuration(statusDuration);
+        storyStatusView.setStoriesCount(statusStoriesObject.getResources().size());
+        storyStatusView.setStoryDuration(statusStoriesObject.getDuration());
         // or
         // statusView.setStoriesCountWithDurations(statusResourcesDuration);
         storyStatusView.setUserInteractionListener(this);
@@ -79,7 +88,10 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
         });
 
         storyStatusView.pause();
-        target.setModel(statusResources[counter]);
+        target.setModel(statusStoriesObject.getResources().get(counter));
+
+
+        sendBroadcastEvent(StatusStoriesBroadcastReceiver.KEY_ACTION_FIRST, counter);
 
         RequestOptions options = new RequestOptions()
                 .centerCrop()
@@ -89,10 +101,6 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
 
                 .priority(Priority.HIGH);
-
-
-
-
 
 
 
@@ -130,15 +138,26 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
                 return true;
             }
         });
+
+
+
+    }
+
+    private void sendBroadcastEvent(String actionName, Integer index){
+        Intent i = new Intent(StatusStoriesBroadcastReceiver.KEY_ACTION);
+        i.putExtra(StatusStoriesBroadcastReceiver.KEY_ACTION, actionName);
+        i.putExtra(StatusStoriesBroadcastReceiver.KEY_INDEX, index);
+        sendBroadcast(i);
     }
 
     @Override
     public void onNext() {
-
-        Log.d("SEH", "onNext");
+        //Log.d("SEH", "onNext");
         storyStatusView.pause();
         ++counter;
-        target.setModel(statusResources[counter]);
+        target.setModel(statusStoriesObject.getResources().get(counter));
+
+        sendBroadcastEvent(StatusStoriesBroadcastReceiver.KEY_ACTION_NEXT, counter);
 
         RequestOptions options = new RequestOptions()
                 .centerCrop()
@@ -149,6 +168,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
                 .priority(Priority.HIGH);
 
+        sendBroadcastEvent(StatusStoriesBroadcastReceiver.KEY_ACTION_NEXT, counter);
 
         GlideApp.with(image.getContext()).asBitmap()
                 .load(target.getModel())
@@ -161,18 +181,21 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     public void onPrev() {
 
-        RequestOptions options = new RequestOptions()
-                .centerCrop()
-                .skipMemoryCache(!isCaching)
-                .diskCacheStrategy(isCaching ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
-
-                .priority(Priority.HIGH);
-
-
         if (counter - 1 < 0) return;
         storyStatusView.pause();
         --counter;
-        target.setModel(statusResources[counter]);
+        target.setModel(statusStoriesObject.getResources().get(counter));
+
+
+        sendBroadcastEvent(StatusStoriesBroadcastReceiver.KEY_ACTION_PREV, counter);
+
+        RequestOptions options = new RequestOptions()
+                .centerCrop()
+                .skipMemoryCache(!statusStoriesObject.getCachingEnabled())
+                .diskCacheStrategy(statusStoriesObject.getCachingEnabled() ? DiskCacheStrategy.ALL : DiskCacheStrategy.NONE)
+
+                .priority(Priority.HIGH);
+
         GlideApp.with(image.getContext()).asBitmap()
                 .load(target.getModel())
                 .transition(withCrossFade())
@@ -185,7 +208,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (isImmersive && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        if (statusStoriesObject.getImmersive() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             if (hasFocus) {
                 getWindow().getDecorView()
                         .setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -239,7 +262,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onConnecting() {
-            Log.d("SEH", "onConnecting");
+            //Log.d("SEH", "onConnecting");
             progress.setIndeterminate(true);
             progress.setVisibility(View.VISIBLE);
 
@@ -272,7 +295,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDownloaded() {
-            Log.d("SEH", "onDownloaded");
+            //Log.d("SEH", "onDownloaded");
             progress.setIndeterminate(true);
             if (isTextEnabled) {
                 text.setVisibility(View.VISIBLE);
@@ -287,7 +310,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDelivered() {
-            Log.d("SEH", "onDelivered");
+            //Log.d("SEH", "onDelivered");
             progress.setVisibility(View.INVISIBLE);
             text.setVisibility(View.INVISIBLE);
             storyStatusView.resume();

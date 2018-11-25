@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -40,8 +41,12 @@ public class OkHttpProgressGlideModule extends LibraryGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
                 .addNetworkInterceptor(createInterceptor(new DispatchingProgressListener()))
                 .build();
+
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(client));
 
     }

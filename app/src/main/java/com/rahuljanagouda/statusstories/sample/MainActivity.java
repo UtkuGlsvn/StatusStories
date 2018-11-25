@@ -1,14 +1,21 @@
 package com.rahuljanagouda.statusstories.sample;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 
 import com.rahuljanagouda.statusstories.StatusStoriesActivity;
+import com.rahuljanagouda.statusstories.broadcastreceiver.StatusStoriesBroadcastReceiver;
+import com.rahuljanagouda.statusstories.data.StatusStoriesObject;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     boolean isImmersiveEnabled = false;
     boolean isTextEnabled = false;
     long storyDuration = 3000L;
+
+    StatusStoriesBroadcastReceiver statusStoriesBroadcastReceiver;
 
     private final String[] resources = new String[]{
             "https://firebasestorage.googleapis.com/v0/b/firebase-satya.appspot.com/o/images%2Fi00001.jpg?alt=media&token=460667e4-e084-4dc5-b873-eefa028cec32",
@@ -29,9 +38,48 @@ public class MainActivity extends AppCompatActivity {
             "https://firebasestorage.googleapis.com/v0/b/firebase-satya.appspot.com/o/images%2Fi00010.jpg?alt=media&token=24f8f091-acb9-432a-ae0f-7e6227d18803",
     };
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StatusStoriesBroadcastReceiver.StatusStoriesListener listener = new StatusStoriesBroadcastReceiver.StatusStoriesListener() {
+            @Override
+            public void onNext(int counter) {
+            }
+
+            @Override
+            public void onPrev(int counter) {
+
+            }
+
+            @Override
+            public void onSkip(int counter) {
+
+            }
+
+            @Override
+            public void onPause(int counter) {
+
+            }
+
+            @Override
+            public void onFirst(int counter) {
+
+            }
+        };
+
+        statusStoriesBroadcastReceiver = new StatusStoriesBroadcastReceiver(listener);
+        registerReceiver(statusStoriesBroadcastReceiver, new IntentFilter(StatusStoriesBroadcastReceiver.KEY_ACTION));
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
+
         setContentView(R.layout.activity_main);
 
 
@@ -77,12 +125,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent a = new Intent(view.getContext(), StatusStoriesActivity.class);
-                a.putExtra(StatusStoriesActivity.STATUS_RESOURCES_KEY, resources);
-                a.putExtra(StatusStoriesActivity.STATUS_DURATION_KEY, storyDuration);
-                a.putExtra(StatusStoriesActivity.IS_IMMERSIVE_KEY, isImmersiveEnabled);
-                a.putExtra(StatusStoriesActivity.IS_CACHING_ENABLED_KEY, isCacheEnabled);
-                a.putExtra(StatusStoriesActivity.IS_TEXT_PROGRESS_ENABLED_KEY, isTextEnabled);
+                StatusStoriesObject storiesObject = new StatusStoriesObject();
+                List<String> stories = Arrays.asList(resources);
+
+                //storiesObject.setListener(listener);
+                storiesObject.setResources(stories);
+                storiesObject.setDuration(storyDuration);
+                storiesObject.setTextProgressEnabled(true);
+                a.putExtra(StatusStoriesActivity.KEY_STATUS_STORIES, storiesObject);
+
+
+
+
+
+//                a.putExtra(StatusStoriesActivity.STATUS_RESOURCES_KEY, resources);
+//                a.putExtra(StatusStoriesActivity.STATUS_DURATION_KEY, storyDuration);
+//                a.putExtra(StatusStoriesActivity.IS_IMMERSIVE_KEY, isImmersiveEnabled);
+//                a.putExtra(StatusStoriesActivity.IS_CACHING_ENABLED_KEY, isCacheEnabled);
+//                a.putExtra(StatusStoriesActivity.IS_TEXT_PROGRESS_ENABLED_KEY, isTextEnabled);
+
+
+
                 startActivity(a);
+
+
+
+
             }
         });
 
