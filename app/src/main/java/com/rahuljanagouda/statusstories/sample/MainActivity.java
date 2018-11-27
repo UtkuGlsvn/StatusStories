@@ -128,21 +128,13 @@ public class MainActivity extends AppCompatActivity {
                 StatusStoriesObject storiesObject = new StatusStoriesObject();
                 List<String> stories = Arrays.asList(resources);
 
-                //storiesObject.setListener(listener);
                 storiesObject.setResources(stories);
                 storiesObject.setDuration(storyDuration);
                 storiesObject.setTextProgressEnabled(true);
+                storiesObject.setImmersive(true);
+                storiesObject.setCachingEnabled(true);
                 a.putExtra(StatusStoriesActivity.KEY_STATUS_STORIES, storiesObject);
 
-
-
-
-
-//                a.putExtra(StatusStoriesActivity.STATUS_RESOURCES_KEY, resources);
-//                a.putExtra(StatusStoriesActivity.STATUS_DURATION_KEY, storyDuration);
-//                a.putExtra(StatusStoriesActivity.IS_IMMERSIVE_KEY, isImmersiveEnabled);
-//                a.putExtra(StatusStoriesActivity.IS_CACHING_ENABLED_KEY, isCacheEnabled);
-//                a.putExtra(StatusStoriesActivity.IS_TEXT_PROGRESS_ENABLED_KEY, isTextEnabled);
 
 
 
