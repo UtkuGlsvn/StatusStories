@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,6 +26,7 @@ import com.rahuljanagouda.statusstories.data.StatusStoriesObject;
 import com.rahuljanagouda.statusstories.glideProgressBar.DelayBitmapTransformation;
 import com.rahuljanagouda.statusstories.glideProgressBar.LoggingListener;
 import com.rahuljanagouda.statusstories.glideProgressBar.ProgressTarget;
+import com.rahuljanagouda.statusstories.listener.DetectSwipeGestureListener;
 
 import java.util.Locale;
 
@@ -58,6 +60,8 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     private StatusStoriesObject statusStoriesObject;
 
     private ProgressTarget<String, Bitmap> target;
+
+    private GestureDetectorCompat gestureDetectorCompat = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,20 +131,37 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
             }
         });
 
+        // Create a common gesture listener object.
+        DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
+
+        // Set activity in the listener.
+        gestureListener.setActivity(this);
+
+        // Create the gesture detector with the gesture listener.
+        gestureDetectorCompat = new GestureDetectorCompat(this, gestureListener);
+
         findViewById(R.id.actions).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
                     storyStatusView.pause();
                 } else {
                     storyStatusView.resume();
+
                 }
+
+                gestureDetectorCompat.onTouchEvent(motionEvent);
+
                 return true;
             }
         });
 
+    }
 
-
+    public void onSwipeDown()
+    {
+        finish();
     }
 
     private void sendBroadcastEvent(String actionName, Integer index){
