@@ -85,4 +85,12 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
         //this.activity.displayMessage("Double tap occurred.");
         return true;
     }
+
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        this.activity.pauseStory();
+        return super.onDown(e);
+    }
+
 }

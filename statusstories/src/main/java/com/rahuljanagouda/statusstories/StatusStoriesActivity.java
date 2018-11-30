@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -49,6 +50,8 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     private static StoryStatusView storyStatusView;
     private ImageView image;
     private int counter = 0;
+
+    private static boolean isLoading = false;
 
 //    private String[] statusResources;
     //    private long[] statusResourcesDuration;
@@ -144,11 +147,19 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    storyStatusView.pause();
-                } else {
-                    storyStatusView.resume();
+//                if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+//                    Log.d("SEH", "HOLD DOWN GESTURE");
+//                    storyStatusView.pause();
+//                } else {
+//                    Log.d("SEH", "NOT HOLD DOWN GESTURE");
+//                    storyStatusView.resume();
+//
+//                }
 
+                if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
+                {
+                    StatusStoriesActivity.this.resumeStory();
+                    return true;
                 }
 
                 gestureDetectorCompat.onTouchEvent(motionEvent);
@@ -169,6 +180,17 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
         i.putExtra(StatusStoriesBroadcastReceiver.KEY_ACTION, actionName);
         i.putExtra(StatusStoriesBroadcastReceiver.KEY_INDEX, index);
         sendBroadcast(i);
+    }
+
+
+    public void pauseStory()
+    {
+       storyStatusView.pause();
+    }
+    public void resumeStory()
+    {
+        if (!isLoading)
+            storyStatusView.resume();
     }
 
     @Override
@@ -283,6 +305,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onConnecting() {
+            isLoading = true;
             //Log.d("SEH", "onConnecting");
             progress.setIndeterminate(true);
             progress.setVisibility(View.VISIBLE);
@@ -316,6 +339,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDownloaded() {
+            isLoading = false;
             //Log.d("SEH", "onDownloaded");
             progress.setIndeterminate(true);
             if (isTextEnabled) {
