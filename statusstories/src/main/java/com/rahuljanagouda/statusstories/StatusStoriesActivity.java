@@ -159,7 +159,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
                 if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP)
                 {
                     StatusStoriesActivity.this.resumeStory();
-                    return true;
+                    //return true;
                 }
 
                 gestureDetectorCompat.onTouchEvent(motionEvent);
@@ -224,7 +224,11 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     public void onPrev() {
 
-        if (counter - 1 < 0) return;
+        if (counter - 1 < 0){
+
+            storyStatusView.resume();
+            return;
+        }
         storyStatusView.pause();
         --counter;
         target.setModel(statusStoriesObject.getResources().get(counter));

@@ -123,6 +123,8 @@ public class StoryStatusView extends LinearLayout {
 
 
     public void reverse() {
+        if (current == 0)
+            return;
         if (isComplete) return;
         ProgressBar p = progressBars.get(current);
         p.setProgress(0);
@@ -183,7 +185,8 @@ public class StoryStatusView extends LinearLayout {
                         ProgressBar p = progressBars.get(current - 1);
                         p.setProgress(0);
                         animators.get(--current).start();
-                    } else {
+                    }
+                    else {
                         animators.get(current).start();
                     }
                     if (userInteractionListener != null) userInteractionListener.onPrev();
