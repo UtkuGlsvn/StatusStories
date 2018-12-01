@@ -355,6 +355,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
         @Override
         protected void onDelivered() {
+            isLoading = false;
             //Log.d("SEH", "onDelivered");
             progress.setVisibility(View.INVISIBLE);
             text.setVisibility(View.INVISIBLE);
