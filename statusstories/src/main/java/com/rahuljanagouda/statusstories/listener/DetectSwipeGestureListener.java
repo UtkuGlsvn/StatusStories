@@ -93,4 +93,9 @@ public class DetectSwipeGestureListener extends GestureDetector.SimpleOnGestureL
         return super.onDown(e);
     }
 
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        this.activity.resumeStory();
+        return super.onSingleTapUp(e);
+    }
 }
