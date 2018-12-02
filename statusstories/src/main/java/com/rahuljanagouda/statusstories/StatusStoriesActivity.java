@@ -1,6 +1,7 @@
 package com.rahuljanagouda.statusstories;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -170,6 +171,23 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        StatusStoriesApp.setCurrentActivity(this);
+
+    }
+
+    @Override
+    protected void onPause() {
+        clearReferences();
+        super.onPause();
+
+    }
+
+
+
     public void onSwipeDown()
     {
         finish();
@@ -274,8 +292,15 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     protected void onDestroy() {
         // Very important !
+        clearReferences();
         storyStatusView.destroy();
         super.onDestroy();
+    }
+
+    private void clearReferences(){
+        Activity currActivity = StatusStoriesApp.getCurrentActivity();
+        if (this.equals(currActivity))
+            StatusStoriesApp.setCurrentActivity(null);
     }
 
     /**
