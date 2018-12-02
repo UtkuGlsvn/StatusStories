@@ -181,7 +181,7 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
 
     @Override
     protected void onPause() {
-        clearReferences();
+        //clearReferences();
         super.onPause();
 
     }
