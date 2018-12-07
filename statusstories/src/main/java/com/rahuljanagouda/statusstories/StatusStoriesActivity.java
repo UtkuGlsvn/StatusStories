@@ -182,6 +182,11 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     protected void onPause() {
         //clearReferences();
+        if (isFinishing())
+        {
+            storyStatusView.destroy();
+            this.clearReferences();
+        }
         super.onPause();
 
     }
@@ -292,8 +297,8 @@ public class StatusStoriesActivity extends AppCompatActivity implements StorySta
     @Override
     protected void onDestroy() {
         // Very important !
-        clearReferences();
-        storyStatusView.destroy();
+        //clearReferences();
+        //storyStatusView.destroy();
         super.onDestroy();
     }
 
